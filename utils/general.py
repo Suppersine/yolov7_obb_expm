@@ -973,6 +973,13 @@ NCOLS = 0 if is_docker() else shutil.get_terminal_size().columns  # terminal win
 """
 General Utils of YV7HBB
 """
+
+def set_logging2(rank=-1):
+    logging.basicConfig(
+        format="%(message)s",
+        level=logging.INFO if rank in [-1, 0] else logging.WARN)
+
+    
 def init_seeds(seed=0):
     # Initialize random number generator (RNG) seeds
     random.seed(seed)
