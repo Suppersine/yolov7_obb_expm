@@ -40,8 +40,11 @@ from utils.wandb_logging.wandb_utils import WandbLogger, check_wandb_resume
 logger = logging.getLogger(__name__)
 
 LOCAL_RANK = int(os.getenv('LOCAL_RANK', -1))  # https://pytorch.org/docs/stable/elastic/run.html
+local_rank = LOCAL_RANK
 RANK = int(os.getenv('RANK', -1))
+rank=RANK
 WORLD_SIZE = int(os.getenv('WORLD_SIZE', 1))
+world_size = WORLD_SIZE
 
 def train(hyp, opt, device, tb_writer=None):
     logger.info(colorstr('hyperparameters: ') + ', '.join(f'{k}={v}' for k, v in hyp.items()))
