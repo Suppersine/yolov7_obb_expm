@@ -14,8 +14,11 @@ from torch.cuda import amp
 
 from utils.datasets import letterbox
 from utils.general import non_max_suppression, make_divisible, scale_coords, increment_path, xyxy2xywh
-from utils.plots import color_list, plot_one_box
+# from utils.plots import color_list, plot_one_box
 from utils.torch_utils import time_synchronized
+from utils.plots import Annotator
+from utils.plots import colors as color_list
+from utils.plots import save_one_box as plot_one_box
 
 
 ##### basic ####
