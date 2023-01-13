@@ -10,6 +10,7 @@ from datetime import datetime
 from pathlib import Path
 from threading import Thread
 
+import val
 import numpy as np
 import torch
 import torch.distributed as dist
@@ -436,7 +437,7 @@ def train(hyp, opt, device, tb_writer=None):
             final_epoch = epoch + 1 == epochs
             if not opt.notest or final_epoch:  # Calculate mAP
                 wandb_logger.current_epoch = epoch + 1
-                results, maps, times = test.test(data_dict,
+                results, maps, times = val.run(data_dict,
                                                  batch_size=batch_size * 2,
                                                  imgsz=imgsz_test,
                                                  model=ema.ema,
@@ -516,7 +517,7 @@ def train(hyp, opt, device, tb_writer=None):
         logger.info('%g epochs completed in %.3f hours.\n' % (epoch - start_epoch + 1, (time.time() - t0) / 3600))
         if opt.data.endswith('coco.yaml') and nc == 80:  # if COCO
             for m in (last, best) if best.exists() else (last):  # speed, mAP tests
-                results, _, _ = test.test(opt.data,
+                results, _, _ = val.run(opt.data,
                                           batch_size=batch_size * 2,
                                           imgsz=imgsz_test,
                                           conf_thres=0.001,
