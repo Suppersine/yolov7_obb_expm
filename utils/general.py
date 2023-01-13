@@ -679,7 +679,6 @@ def clip_coords(boxes, shape):
 def non_max_suppression(prediction, conf_thres=0.25, iou_thres=0.45, classes=None, agnostic=False, multi_label=False,
                         labels=(), max_det=300):
     """Runs Non-Maximum Suppression (NMS) on inference results
-
     Returns:
          list of detections, on (n,6) tensor per image [xyxy, conf, cls]
     """
@@ -776,7 +775,6 @@ def non_max_suppression_obb(prediction, conf_thres=0.25, iou_thres=0.45, classes
         prediction (tensor): (b, n_all_anchors, [cx cy l s obj num_cls theta_cls])
         agnostic (bool): True = NMS will be applied between elements of different categories
         labels : () or
-
     Returns:
         list of detections, len=batch_size, on (n,7) tensor per image [xylsθ, conf, cls] θ ∈ [-pi/2, pi/2)
     """
@@ -974,23 +972,19 @@ NCOLS = 0 if is_docker() else shutil.get_terminal_size().columns  # terminal win
 General Utils of YV7HBB
 """
 
-#Temporarily disabled to revise box imports
 """
+#Temporarily disabled to revise box imports
+
 def set_logging2(rank=-1):
     logging.basicConfig(
         format="%(message)s",
         level=logging.INFO if rank in [-1, 0] else logging.WARN)
-
-
 def isdocker():
     # Is environment a Docker container
     return Path('/workspace').exists()  # or Path('/.dockerenv').exists()
-
-
 def bbox_iou(box1, box2, x1y1x2y2=True, GIoU=False, DIoU=False, CIoU=False, eps=1e-7):
     # Returns the IoU of box1 to box2. box1 is 4, box2 is nx4
     box2 = box2.T
-
     # Get the coordinates of bounding boxes
     if x1y1x2y2:  # x1, y1, x2, y2 = box1
         b1_x1, b1_y1, b1_x2, b1_y2 = box1[0], box1[1], box1[2], box1[3]
@@ -1000,18 +994,14 @@ def bbox_iou(box1, box2, x1y1x2y2=True, GIoU=False, DIoU=False, CIoU=False, eps=
         b1_y1, b1_y2 = box1[1] - box1[3] / 2, box1[1] + box1[3] / 2
         b2_x1, b2_x2 = box2[0] - box2[2] / 2, box2[0] + box2[2] / 2
         b2_y1, b2_y2 = box2[1] - box2[3] / 2, box2[1] + box2[3] / 2
-
     # Intersection area
     inter = (torch.min(b1_x2, b2_x2) - torch.max(b1_x1, b2_x1)).clamp(0) * \
             (torch.min(b1_y2, b2_y2) - torch.max(b1_y1, b2_y1)).clamp(0)
-
     # Union Area
     w1, h1 = b1_x2 - b1_x1, b1_y2 - b1_y1 + eps
     w2, h2 = b2_x2 - b2_x1, b2_y2 - b2_y1 + eps
     union = w1 * h1 + w2 * h2 - inter + eps
-
     iou = inter / union
-
     if GIoU or DIoU or CIoU:
         cw = torch.max(b1_x2, b2_x2) - torch.min(b1_x1, b2_x1)  # convex (smallest enclosing box) width
         ch = torch.max(b1_y2, b2_y2) - torch.min(b1_y1, b2_y1)  # convex height
@@ -1031,14 +1021,9 @@ def bbox_iou(box1, box2, x1y1x2y2=True, GIoU=False, DIoU=False, CIoU=False, eps=
             return iou - (c_area - union) / c_area  # GIoU
     else:
         return iou  # IoU
-
-
-
-
 def bbox_alpha_iou(box1, box2, x1y1x2y2=False, GIoU=False, DIoU=False, CIoU=False, alpha=2, eps=1e-9):
     # Returns tsqrt_he IoU of box1 to box2. box1 is 4, box2 is nx4
     box2 = box2.T
-
     # Get the coordinates of bounding boxes
     if x1y1x2y2:  # x1, y1, x2, y2 = box1
         b1_x1, b1_y1, b1_x2, b1_y2 = box1[0], box1[1], box1[2], box1[3]
@@ -1048,16 +1033,13 @@ def bbox_alpha_iou(box1, box2, x1y1x2y2=False, GIoU=False, DIoU=False, CIoU=Fals
         b1_y1, b1_y2 = box1[1] - box1[3] / 2, box1[1] + box1[3] / 2
         b2_x1, b2_x2 = box2[0] - box2[2] / 2, box2[0] + box2[2] / 2
         b2_y1, b2_y2 = box2[1] - box2[3] / 2, box2[1] + box2[3] / 2
-
     # Intersection area
     inter = (torch.min(b1_x2, b2_x2) - torch.max(b1_x1, b2_x1)).clamp(0) * \
             (torch.min(b1_y2, b2_y2) - torch.max(b1_y1, b2_y1)).clamp(0)
-
     # Union Area
     w1, h1 = b1_x2 - b1_x1, b1_y2 - b1_y1 + eps
     w2, h2 = b2_x2 - b2_x1, b2_y2 - b2_y1 + eps
     union = w1 * h1 + w2 * h2 - inter + eps
-
     # change iou into pow(iou+eps)
     # iou = inter / union
     iou = torch.pow(inter/union + eps, alpha)
@@ -1085,20 +1067,19 @@ def bbox_alpha_iou(box1, box2, x1y1x2y2=False, GIoU=False, DIoU=False, CIoU=Fals
             return iou - torch.pow((c_area - union) / c_area + eps, alpha)  # GIoU
     else:
         return iou # torch.log(iou+eps) or iou
-
-
+"""
+"""
 def box_iou(box1, box2):
     # https://github.com/pytorch/vision/blob/master/torchvision/ops/boxes.py
-    """
-    Return intersection-over-union (Jaccard index) of boxes.
-    Both sets of boxes are expected to be in (x1, y1, x2, y2) format.
-    Arguments:
-        box1 (Tensor[N, 4])
-        box2 (Tensor[M, 4])
-    Returns:
-        iou (Tensor[N, M]): the NxM matrix containing the pairwise
-            IoU values for every element in boxes1 and boxes2
-    """
+
+    #Return intersection-over-union (Jaccard index) of boxes.
+    #Both sets of boxes are expected to be in (x1, y1, x2, y2) format.
+    #Arguments:
+    #    box1 (Tensor[N, 4])
+    #    box2 (Tensor[M, 4])
+    #Returns:
+    #    iou (Tensor[N, M]): the NxM matrix containing the pairwise
+    #        IoU values for every element in boxes1 and boxes2
 
     def box_area(box):
         # box = 4xn
@@ -1110,7 +1091,8 @@ def box_iou(box1, box2):
     # inter(N,M) = (rb(N,M,2) - lt(N,M,2)).clamp(0).prod(2)
     inter = (torch.min(box1[:, None, 2:], box2[:, 2:]) - torch.max(box1[:, None, :2], box2[:, :2])).clamp(0).prod(2)
     return inter / (area1[:, None] + area2 - inter)  # iou = inter / (area1 + area2 - inter)
-
+"""
+"""
 
 def wh_iou(wh1, wh2):
     # Returns the nxm IoU matrix. wh1 is nx2, wh2 is mx2
@@ -1119,9 +1101,11 @@ def wh_iou(wh1, wh2):
     inter = torch.min(wh1, wh2).prod(2)  # [N,M]
     return inter / (wh1.prod(2) + wh2.prod(2) - inter)  # iou = inter / (area1 + area2 - inter)
 
-
+"""
+"""
 def box_giou(box1, box2):
-    """
+   
+    
     Return generalized intersection-over-union (Jaccard index) between two sets of boxes.
     Both sets of boxes are expected to be in ``(x1, y1, x2, y2)`` format with
     ``0 <= x1 < x2`` and ``0 <= y1 < y2``.
@@ -1131,8 +1115,8 @@ def box_giou(box1, box2):
     Returns:
         Tensor[N, M]: the NxM matrix containing the pairwise generalized IoU values
         for every element in boxes1 and boxes2
-    """
-
+    
+    
     def box_area(box):
         # box = 4xn
         return (box[2] - box[0]) * (box[3] - box[1])
@@ -1153,9 +1137,12 @@ def box_giou(box1, box2):
 
     return iou - (areai - union) / areai
 
+"""
+"""
 
 def box_ciou(box1, box2, eps: float = 1e-7):
-    """
+    
+    
     Return complete intersection-over-union (Jaccard index) between two sets of boxes.
     Both sets of boxes are expected to be in ``(x1, y1, x2, y2)`` format with
     ``0 <= x1 < x2`` and ``0 <= y1 < y2``.
@@ -1166,7 +1153,7 @@ def box_ciou(box1, box2, eps: float = 1e-7):
     Returns:
         Tensor[N, M]: the NxM matrix containing the pairwise complete IoU values
         for every element in boxes1 and boxes2
-    """
+    
 
     def box_area(box):
         # box = 4xn
@@ -1205,9 +1192,12 @@ def box_ciou(box1, box2, eps: float = 1e-7):
         alpha = v / (1 - iou + v + eps)
     return iou - (centers_distance_squared / diagonal_distance_squared) - alpha * v
 
+"""
+"""
 
 def box_diou(box1, box2, eps: float = 1e-7):
-    """
+    
+    
     Return distance intersection-over-union (Jaccard index) between two sets of boxes.
     Both sets of boxes are expected to be in ``(x1, y1, x2, y2)`` format with
     ``0 <= x1 < x2`` and ``0 <= y1 < y2``.
@@ -1218,8 +1208,8 @@ def box_diou(box1, box2, eps: float = 1e-7):
     Returns:
         Tensor[N, M]: the NxM matrix containing the pairwise distance IoU values
         for every element in boxes1 and boxes2
-    """
-
+    
+    
     def box_area(box):
         # box = 4xn
         return (box[2] - box[0]) * (box[3] - box[1])
@@ -1249,14 +1239,16 @@ def box_diou(box1, box2, eps: float = 1e-7):
     # The distance IoU is the IoU penalized by a normalized
     # distance between boxes' centers squared.
     return iou - (centers_distance_squared / diagonal_distance_squared)
-
+"""
+"""
 
 def non_max_suppression(prediction, conf_thres=0.25, iou_thres=0.45, classes=None, agnostic=False, multi_label=False,
                         labels=()):
-    """Runs Non-Maximum Suppression (NMS) on inference results
-    Returns:
-         list of detections, on (n,6) tensor per image [xyxy, conf, cls]
-    """
+    
+    # Runs Non-Maximum Suppression (NMS) on inference results
+    # Returns:
+    #      list of detections, on (n,6) tensor per image [xyxy, conf, cls]
+    
 
     nc = prediction.shape[2] - 5  # number of classes
     xc = prediction[..., 4] > conf_thres  # candidates
@@ -1343,14 +1335,15 @@ def non_max_suppression(prediction, conf_thres=0.25, iou_thres=0.45, classes=Non
             break  # time limit exceeded
 
     return output
-
-
+"""
+"""
 def non_max_suppression_kpt(prediction, conf_thres=0.25, iou_thres=0.45, classes=None, agnostic=False, multi_label=False,
                         labels=(), kpt_label=False, nc=None, nkpt=None):
-    """Runs Non-Maximum Suppression (NMS) on inference results
-    Returns:
-         list of detections, on (n,6) tensor per image [xyxy, conf, cls]
-    """
+    
+    # Runs Non-Maximum Suppression (NMS) on inference results
+    # Returns:
+    #     list of detections, on (n,6) tensor per image [xyxy, conf, cls]
+    
     if nc is None:
         nc = prediction.shape[2] - 5  if not kpt_label else prediction.shape[2] - 56 # number of classes
     xc = prediction[..., 4] > conf_thres  # candidates
