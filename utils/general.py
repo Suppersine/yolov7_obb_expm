@@ -972,7 +972,7 @@ NCOLS = 0 if is_docker() else shutil.get_terminal_size().columns  # terminal win
 General Utils of YV7HBB
 """
 
-"""
+
 #Temporarily disabled to revise box imports
 
 def set_logging2(rank=-1):
@@ -982,6 +982,8 @@ def set_logging2(rank=-1):
 def isdocker():
     # Is environment a Docker container
     return Path('/workspace').exists()  # or Path('/.dockerenv').exists()
+
+"""
 def bbox_iou(box1, box2, x1y1x2y2=True, GIoU=False, DIoU=False, CIoU=False, eps=1e-7):
     # Returns the IoU of box1 to box2. box1 is 4, box2 is nx4
     box2 = box2.T
@@ -1021,6 +1023,8 @@ def bbox_iou(box1, box2, x1y1x2y2=True, GIoU=False, DIoU=False, CIoU=False, eps=
             return iou - (c_area - union) / c_area  # GIoU
     else:
         return iou  # IoU
+
+"""
 def bbox_alpha_iou(box1, box2, x1y1x2y2=False, GIoU=False, DIoU=False, CIoU=False, alpha=2, eps=1e-9):
     # Returns tsqrt_he IoU of box1 to box2. box1 is 4, box2 is nx4
     box2 = box2.T
@@ -1067,8 +1071,7 @@ def bbox_alpha_iou(box1, box2, x1y1x2y2=False, GIoU=False, DIoU=False, CIoU=Fals
             return iou - torch.pow((c_area - union) / c_area + eps, alpha)  # GIoU
     else:
         return iou # torch.log(iou+eps) or iou
-"""
-"""
+
 def box_iou(box1, box2):
     # https://github.com/pytorch/vision/blob/master/torchvision/ops/boxes.py
 
@@ -1091,8 +1094,7 @@ def box_iou(box1, box2):
     # inter(N,M) = (rb(N,M,2) - lt(N,M,2)).clamp(0).prod(2)
     inter = (torch.min(box1[:, None, 2:], box2[:, 2:]) - torch.max(box1[:, None, :2], box2[:, :2])).clamp(0).prod(2)
     return inter / (area1[:, None] + area2 - inter)  # iou = inter / (area1 + area2 - inter)
-"""
-"""
+
 
 def wh_iou(wh1, wh2):
     # Returns the nxm IoU matrix. wh1 is nx2, wh2 is mx2
@@ -1101,11 +1103,10 @@ def wh_iou(wh1, wh2):
     inter = torch.min(wh1, wh2).prod(2)  # [N,M]
     return inter / (wh1.prod(2) + wh2.prod(2) - inter)  # iou = inter / (area1 + area2 - inter)
 
-"""
-"""
+
 def box_giou(box1, box2):
    
-    
+    """
     Return generalized intersection-over-union (Jaccard index) between two sets of boxes.
     Both sets of boxes are expected to be in ``(x1, y1, x2, y2)`` format with
     ``0 <= x1 < x2`` and ``0 <= y1 < y2``.
@@ -1115,7 +1116,7 @@ def box_giou(box1, box2):
     Returns:
         Tensor[N, M]: the NxM matrix containing the pairwise generalized IoU values
         for every element in boxes1 and boxes2
-    
+    """
     
     def box_area(box):
         # box = 4xn
@@ -1137,12 +1138,9 @@ def box_giou(box1, box2):
 
     return iou - (areai - union) / areai
 
-"""
-"""
-
 def box_ciou(box1, box2, eps: float = 1e-7):
     
-    
+    """
     Return complete intersection-over-union (Jaccard index) between two sets of boxes.
     Both sets of boxes are expected to be in ``(x1, y1, x2, y2)`` format with
     ``0 <= x1 < x2`` and ``0 <= y1 < y2``.
@@ -1158,6 +1156,7 @@ def box_ciou(box1, box2, eps: float = 1e-7):
     def box_area(box):
         # box = 4xn
         return (box[2] - box[0]) * (box[3] - box[1])
+    """
 
     area1 = box_area(box1.T)
     area2 = box_area(box2.T)
@@ -1192,12 +1191,10 @@ def box_ciou(box1, box2, eps: float = 1e-7):
         alpha = v / (1 - iou + v + eps)
     return iou - (centers_distance_squared / diagonal_distance_squared) - alpha * v
 
-"""
-"""
 
 def box_diou(box1, box2, eps: float = 1e-7):
     
-    
+    """
     Return distance intersection-over-union (Jaccard index) between two sets of boxes.
     Both sets of boxes are expected to be in ``(x1, y1, x2, y2)`` format with
     ``0 <= x1 < x2`` and ``0 <= y1 < y2``.
@@ -1208,7 +1205,7 @@ def box_diou(box1, box2, eps: float = 1e-7):
     Returns:
         Tensor[N, M]: the NxM matrix containing the pairwise distance IoU values
         for every element in boxes1 and boxes2
-    
+    """
     
     def box_area(box):
         # box = 4xn
@@ -1239,14 +1236,13 @@ def box_diou(box1, box2, eps: float = 1e-7):
     # The distance IoU is the IoU penalized by a normalized
     # distance between boxes' centers squared.
     return iou - (centers_distance_squared / diagonal_distance_squared)
-"""
-"""
 
+"""
 def non_max_suppression(prediction, conf_thres=0.25, iou_thres=0.45, classes=None, agnostic=False, multi_label=False,
                         labels=()):
     
-    # Runs Non-Maximum Suppression (NMS) on inference results
-    # Returns:
+    #Runs Non-Maximum Suppression (NMS) on inference results
+    #Returns:
     #      list of detections, on (n,6) tensor per image [xyxy, conf, cls]
     
 
@@ -1336,7 +1332,7 @@ def non_max_suppression(prediction, conf_thres=0.25, iou_thres=0.45, classes=Non
 
     return output
 """
-"""
+
 def non_max_suppression_kpt(prediction, conf_thres=0.25, iou_thres=0.45, classes=None, agnostic=False, multi_label=False,
                         labels=(), kpt_label=False, nc=None, nkpt=None):
     
@@ -1433,7 +1429,7 @@ def non_max_suppression_kpt(prediction, conf_thres=0.25, iou_thres=0.45, classes
 
     return output
 
-
+"""
 def strip_optimizer(f='best.pt', s=''):  # from utils.general import *; strip_optimizer()
     # Strip optimizer from 'f' to finalize training, optionally save as 's'
     x = torch.load(f, map_location=torch.device('cpu'))
@@ -1448,8 +1444,9 @@ def strip_optimizer(f='best.pt', s=''):  # from utils.general import *; strip_op
     torch.save(x, s or f)
     mb = os.path.getsize(s or f) / 1E6  # filesize
     print(f"Optimizer stripped from {f},{(' saved as %s,' % s) if s else ''} {mb:.1f}MB")
+"""
 
-
+"""
 def print_mutation(hyp, results, yaml_file='hyp_evolved.yaml', bucket=''):
     # Print mutation results to evolve.txt (for use with train.py --evolve)
     a = '%10s' * len(hyp) % tuple(hyp.keys())  # hyperparam keys
@@ -1479,8 +1476,9 @@ def print_mutation(hyp, results, yaml_file='hyp_evolved.yaml', bucket=''):
 
     if bucket:
         os.system('gsutil cp evolve.txt %s gs://%s' % (yaml_file, bucket))  # upload
+"""
 
-
+"""
 def apply_classifier(x, model, img, im0):
     # applies a second stage classifier to yolo outputs
     im0 = [im0] if isinstance(im0, np.ndarray) else im0
@@ -1514,8 +1512,9 @@ def apply_classifier(x, model, img, im0):
             x[i] = x[i][pred_cls1 == pred_cls2]  # retain matching class detections
 
     return x
+"""
 
-
+"""
 def increment_path(path, exist_ok=True, sep=''):
     # Increment path, i.e. runs/exp --> runs/exp{sep}0, runs/exp{sep}1 etc.
     path = Path(path)  # os-agnostic
