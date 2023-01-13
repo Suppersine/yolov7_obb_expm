@@ -1028,6 +1028,7 @@ def bbox_iou(box1, box2, x1y1x2y2=True, GIoU=False, DIoU=False, CIoU=False, eps=
 def bbox_alpha_iou(box1, box2, x1y1x2y2=False, GIoU=False, DIoU=False, CIoU=False, alpha=2, eps=1e-9):
     # Returns tsqrt_he IoU of box1 to box2. box1 is 4, box2 is nx4
     box2 = box2.T
+
     # Get the coordinates of bounding boxes
     if x1y1x2y2:  # x1, y1, x2, y2 = box1
         b1_x1, b1_y1, b1_x2, b1_y2 = box1[0], box1[1], box1[2], box1[3]
@@ -1037,13 +1038,16 @@ def bbox_alpha_iou(box1, box2, x1y1x2y2=False, GIoU=False, DIoU=False, CIoU=Fals
         b1_y1, b1_y2 = box1[1] - box1[3] / 2, box1[1] + box1[3] / 2
         b2_x1, b2_x2 = box2[0] - box2[2] / 2, box2[0] + box2[2] / 2
         b2_y1, b2_y2 = box2[1] - box2[3] / 2, box2[1] + box2[3] / 2
+
     # Intersection area
     inter = (torch.min(b1_x2, b2_x2) - torch.max(b1_x1, b2_x1)).clamp(0) * \
             (torch.min(b1_y2, b2_y2) - torch.max(b1_y1, b2_y1)).clamp(0)
+
     # Union Area
     w1, h1 = b1_x2 - b1_x1, b1_y2 - b1_y1 + eps
     w2, h2 = b2_x2 - b2_x1, b2_y2 - b2_y1 + eps
     union = w1 * h1 + w2 * h2 - inter + eps
+
     # change iou into pow(iou+eps)
     # iou = inter / union
     iou = torch.pow(inter/union + eps, alpha)
@@ -1072,17 +1076,19 @@ def bbox_alpha_iou(box1, box2, x1y1x2y2=False, GIoU=False, DIoU=False, CIoU=Fals
     else:
         return iou # torch.log(iou+eps) or iou
 
+
 def box_iou(box1, box2):
     # https://github.com/pytorch/vision/blob/master/torchvision/ops/boxes.py
-
-    #Return intersection-over-union (Jaccard index) of boxes.
-    #Both sets of boxes are expected to be in (x1, y1, x2, y2) format.
-    #Arguments:
-    #    box1 (Tensor[N, 4])
-    #    box2 (Tensor[M, 4])
-    #Returns:
-    #    iou (Tensor[N, M]): the NxM matrix containing the pairwise
-    #        IoU values for every element in boxes1 and boxes2
+    """
+    Return intersection-over-union (Jaccard index) of boxes.
+    Both sets of boxes are expected to be in (x1, y1, x2, y2) format.
+    Arguments:
+        box1 (Tensor[N, 4])
+        box2 (Tensor[M, 4])
+    Returns:
+        iou (Tensor[N, M]): the NxM matrix containing the pairwise
+            IoU values for every element in boxes1 and boxes2
+    """
 
     def box_area(box):
         # box = 4xn
@@ -1105,7 +1111,6 @@ def wh_iou(wh1, wh2):
 
 
 def box_giou(box1, box2):
-   
     """
     Return generalized intersection-over-union (Jaccard index) between two sets of boxes.
     Both sets of boxes are expected to be in ``(x1, y1, x2, y2)`` format with
@@ -1117,7 +1122,7 @@ def box_giou(box1, box2):
         Tensor[N, M]: the NxM matrix containing the pairwise generalized IoU values
         for every element in boxes1 and boxes2
     """
-    
+
     def box_area(box):
         # box = 4xn
         return (box[2] - box[0]) * (box[3] - box[1])
@@ -1138,8 +1143,8 @@ def box_giou(box1, box2):
 
     return iou - (areai - union) / areai
 
+
 def box_ciou(box1, box2, eps: float = 1e-7):
-    
     """
     Return complete intersection-over-union (Jaccard index) between two sets of boxes.
     Both sets of boxes are expected to be in ``(x1, y1, x2, y2)`` format with
@@ -1151,12 +1156,11 @@ def box_ciou(box1, box2, eps: float = 1e-7):
     Returns:
         Tensor[N, M]: the NxM matrix containing the pairwise complete IoU values
         for every element in boxes1 and boxes2
-    
+    """
 
     def box_area(box):
         # box = 4xn
         return (box[2] - box[0]) * (box[3] - box[1])
-    """
 
     area1 = box_area(box1.T)
     area2 = box_area(box2.T)
@@ -1193,7 +1197,6 @@ def box_ciou(box1, box2, eps: float = 1e-7):
 
 
 def box_diou(box1, box2, eps: float = 1e-7):
-    
     """
     Return distance intersection-over-union (Jaccard index) between two sets of boxes.
     Both sets of boxes are expected to be in ``(x1, y1, x2, y2)`` format with
@@ -1206,7 +1209,7 @@ def box_diou(box1, box2, eps: float = 1e-7):
         Tensor[N, M]: the NxM matrix containing the pairwise distance IoU values
         for every element in boxes1 and boxes2
     """
-    
+
     def box_area(box):
         # box = 4xn
         return (box[2] - box[0]) * (box[3] - box[1])
