@@ -32,7 +32,7 @@ from utils.general import (LOGGER, box_iou, check_dataset, check_img_size, check
                            scale_coords, scale_polys, xywh2xyxy, xyxy2xywh, non_max_suppression_obb)
 from utils.metrics import ConfusionMatrix, ap_per_class
 from utils.plots import output_to_target, plot_images, plot_val_study
-from utils.torch_utils import select_device, time_sync
+from utils.torch_utils import select_device
 from utils.torch_utils import time_synchronized as time_sync
 
 
