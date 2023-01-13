@@ -37,7 +37,7 @@ from utils.general import labels_to_class_weights, increment_path, labels_to_ima
     fitness, strip_optimizer, get_latest_run, check_dataset, check_file, check_git_status, check_img_size, \
     check_requirements, print_mutation, set_logging2, one_cycle, colorstr
 # from utils.downloads import attempt_download
-# from utils.google_utils import attempt_download
+from utils.google_utils import attempt_download
 from utils.loss import ComputeLoss
 from utils.plots import plot_images, plot_labels, plot_results
 from utils.plots import plot_evolve as plot_evolution
