@@ -42,6 +42,7 @@ from utils.loss import ComputeLoss
 from utils.plots import plot_images, plot_labels, plot_results
 from utils.plots import plot_evolve as plot_evolution
 from utils.torch_utils import ModelEMA, select_device, intersect_dicts, torch_distributed_zero_first, is_parallel
+from utils.torch_utils import EarlyStopping, ModelEMA, de_parallel, select_device, torch_distributed_zero_first
 from utils.wandb_logging.wandb_utils import WandbLogger, check_wandb_resume
 
 logger = logging.getLogger(__name__)
