@@ -45,6 +45,7 @@ from utils.plots import plot_evolve as plot_evolution
 from utils.torch_utils import EarlyStopping, ModelEMA, de_parallel, select_device, intersect_dicts, torch_distributed_zero_first, is_parallel
 from utils.wandb_logging.wandb_utils import WandbLogger, check_wandb_resume
 
+trainmode = input('Select a training mode; 1=val.run 2=test.test.')
 logger = logging.getLogger(__name__)
 
 LOCAL_RANK = int(os.getenv('LOCAL_RANK', -1))  # https://pytorch.org/docs/stable/elastic/run.html
@@ -437,8 +438,8 @@ def train(hyp, opt, device, tb_writer=None):
             final_epoch = epoch + 1 == epochs
             if not opt.notest or final_epoch:  # Calculate mAP
                 wandb_logger.current_epoch = epoch + 1
-                """                
-                results, maps, times = val.run(data_dict,
+                if trainmode == 1:
+                    results, maps, times = val.run(data_dict,
                                                batch_size=batch_size // WORLD_SIZE * 2,
                                                imgsz=imgsz,
                                                model=ema.ema,
@@ -448,8 +449,8 @@ def train(hyp, opt, device, tb_writer=None):
                                                plots=False,
                                                callbacks=callbacks,
                                                compute_loss=compute_loss)
-                """
-                results, maps, times = test.test(opt.data,
+                else:
+                    results, maps, times = test.test(opt.data,
                                                 batch_size=batch_size * 2,
                                                 imgsz=imgsz_test,
                                                 model=ema.ema,
@@ -528,8 +529,8 @@ def train(hyp, opt, device, tb_writer=None):
         logger.info('%g epochs completed in %.3f hours.\n' % (epoch - start_epoch + 1, (time.time() - t0) / 3600))
         if opt.data.endswith('coco.yaml') and nc == 80:  # if COCO
             for m in (last, best) if best.exists() else (last):  # speed, mAP tests
-                """
-                results, _, _ = val.run(data_dict,
+                if trainmode == 1:
+                    results, _, _ = val.run(data_dict,
                                             batch_size=batch_size // WORLD_SIZE * 2,
                                             imgsz=imgsz,
                                             model=attempt_load(f, device).half(),
@@ -542,8 +543,8 @@ def train(hyp, opt, device, tb_writer=None):
                                             plots=True,
                                             callbacks=callbacks,
                                             compute_loss=compute_loss)  # val best model with plots
-                """
-                results, _, _ = test.test(opt.data,
+                else:
+                    esults, _, _ = test.test(opt.data,
                                           batch_size=batch_size * 2,
                                           imgsz=imgsz_test,
                                           conf_thres=0.001,
