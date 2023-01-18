@@ -20,7 +20,6 @@ from utils.plots import Annotator
 from utils.plots import colors as color_list
 from utils.plots import save_one_box as plot_one_box
 
-
 ##### basic ####
 
 def autopad(k, p=None):  # kernel, padding
