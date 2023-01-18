@@ -549,7 +549,7 @@ def xyxy2xywh(x):
     y[:, 1] = (x[:, 1] + x[:, 3]) / 2  # y center
     y[:, 2] = x[:, 2] - x[:, 0]  # width
     y[:, 3] = x[:, 3] - x[:, 1]  # height
-    return y
+    return 
 
 
 def xywh2xyxy(x):
@@ -581,7 +581,7 @@ def xyxy2xywhn(x, w=640, h=640, clip=False, eps=0.0):
     y[:, 1] = ((x[:, 1] + x[:, 3]) / 2) / h  # y center
     y[:, 2] = (x[:, 2] - x[:, 0]) / w  # width
     y[:, 3] = (x[:, 3] - x[:, 1]) / h  # height
-    return y
+    return 
 
 
 def xyn2xy(x, w=640, h=640, padw=0, padh=0):
@@ -633,6 +633,7 @@ def scale_coords(img1_shape, coords, img0_shape, ratio_pad=None):
     clip_coords(coords, img0_shape)
     return coords
 
+
 def scale_polys(img1_shape, polys, img0_shape, ratio_pad=None):
     # ratio_pad: [(h_raw, w_raw), (hw_ratios, wh_paddings)]
     # Rescale coords (xyxyxyxy) from img1_shape to img0_shape
@@ -649,6 +650,7 @@ def scale_polys(img1_shape, polys, img0_shape, ratio_pad=None):
     #clip_polys(polys, img0_shape)
     return polys
 
+
 def clip_polys(polys, shape):
     # Clip bounding xyxyxyxy bounding boxes to image shape (height, width)
     if isinstance(polys, torch.Tensor):  # faster individually
@@ -663,6 +665,7 @@ def clip_polys(polys, shape):
     else:  # np.array (faster grouped)
         polys[:, [0, 2, 4, 6]] = polys[:, [0, 2, 4, 6]].clip(0, shape[1])  # x1, x2, x3, x4
         polys[:, [1, 3, 5, 7]] = polys[:, [1, 3, 5, 7]].clip(0, shape[0])  # y1, y2, y3, y4
+
 
 def clip_coords(boxes, shape):
     # Clip bounding xyxy bounding boxes to image shape (height, width)
